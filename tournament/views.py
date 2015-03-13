@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from tournament.models import Judge, Room_Stat, Speaker, Team, SpeakerPoint, Room
+from tournament.models import Judge, Room_Stat, Speaker, Team, SpeakerPoint, Room, Tournament_Settings
 from tournament.forms import CodeForm, JudgeBallot
 from django.http import HttpResponseRedirect, HttpResponse
 #Judge code input
@@ -30,6 +30,8 @@ def judge(request,judge_code):
         context_dict={'judge_name':None}
     n = Room_Stat.objects.order_by('-round_number')[0]
     n = n.round_number
+    if judge.round_filled == n:
+        return (HttpResponse("You have already turned in ballot. <br> <a href='/tournament'>Click to return</a>"))
     context_dict['round_number']=str(n)
     #Get Match-up Data to display
     if judge:
@@ -72,6 +74,20 @@ def judge(request,judge_code):
             #Team Score
             prop_sum = form.cleaned_data['prop_1']+form.cleaned_data['prop_2']+form.cleaned_data['prop_3']+form.cleaned_data['prop_reply']
             oppo_sum = form.cleaned_data['oppo_1']+form.cleaned_data['oppo_2']+form.cleaned_data['oppo_3']+form.cleaned_data['oppo_reply']
+            margin_limit = Tournament_Settings.objects.all()[0]
+            margin_limit = margin_limit.Max_Margin
+            flag = False
+            for score in form.cleaned_data:
+                if score > 100:
+                    flag = True
+                if score < 30:
+                    flag = True
+            if form.cleaned_data['prop_reply']>50 or form.cleaned_data['oppo_reply']>50:
+                flag= True
+            if flag:
+                return (HttpResponse("Score out of limit <br> <a href='/tournament/'>Try Again</a>"))
+            if (prop_sum - oppo_sum) * (prop_sum - oppo_sum) > margin_limit * margin_limit:
+                return (HttpResponse("Margin Too Big <br> <a href='/tournament/'>Try Again</a>"))
             if prop_sum > oppo_sum:
                 prop_team.total_wl +=1
             else:
@@ -133,6 +149,7 @@ def judge(request,judge_code):
 
 #Match Up
 def matchup(request):
+    initiate = Room_Stat.objects.get_or_create(round_number=0, prop_team=Team.objects.all()[0],oppo_team=Team.objects.all()[1], chair=Judge.objects.all()[0],room_id=Room.objects.all()[0])
     n = Room_Stat.objects.order_by('-round_number')[0]
     n_int = n.round_number
     n = float(n.round_number)

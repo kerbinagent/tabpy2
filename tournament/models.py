@@ -14,8 +14,8 @@ class Team(models.Model):
     total_wl = models.IntegerField(default=0)
     total_po = models.IntegerField(default=0)
     po_str = models.CharField(max_length=32, default="", blank=True)
-    total_sp = models.IntegerField(default=0)
-    total_mg = models.IntegerField(default=0)
+    total_sp = models.FloatField(default=0)
+    total_mg = models.FloatField(default=0)
     novice = models.BooleanField(default=False)
     pull_up = models.BooleanField(default=False)
     slug = models.SlugField(max_length=128,unique=True)
@@ -50,6 +50,7 @@ class Judge(models.Model):
     name = models.CharField(max_length=64, unique=True, primary_key=True)
     code = models.CharField(max_length=8, unique=True, default='CODE')
     weight = models.IntegerField(default=1)
+    round_filled = models.IntegerField(default=0)
 
     def __unicode__(self):
         return (self.name)
@@ -72,3 +73,12 @@ class Room_Stat(models.Model):
 
     def __unicode__(self):
         return ("Round "+str(self.round_number)+" in "+str(self.room_id))
+
+class Tournament_Settings(models.Model):
+    Max_Margin = models.IntegerField(default=300)
+    Total_Rounds = models.IntegerField(default=8)
+    Novice_Breaks = models.IntegerField(default=4)
+    Breaks = models.IntegerField(default=16)
+
+    def __unicode__(self):
+        return ("Global Setting for Tournament")
