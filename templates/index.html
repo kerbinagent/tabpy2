@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+      <title>Welcome to WTab 2</title>
+    </head>
+    <body>
+        <form id="code_input" method="post" action="">
+          {% csrf_token %}
+          {{form}}
+          <input type="submit" name="submit" value="Get This Round's Ballot">
+        </form>
+        <br>
+        <a href="/tournament/matchup/{{n}}">View Current Matchups</a>
+    </body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+      <title>WTab 2</title>
+      <style>
+      table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 5px;
+      }
+      th {
+        text-align: left;
+      }
+      </style>
+    </head>
+    <body>
+      <table>
+        <tr>
+          <th>Prop</th>
+          <th>Oppo</th>
+          <th>Room</th>
+          <th>Chair</th>
+        </tr>
+        {% for room in room_stat %}
+          <tr>
+            <td>{{room.prop_team}}</td>
+            <td>{{room.oppo_team}}</td>
+            <td>{{room.room_id}}</td>
+            <td>{{room.chair}}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </body>
+</html>
