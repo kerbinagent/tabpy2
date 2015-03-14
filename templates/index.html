@@ -1,15 +1,51 @@
 <!DOCTYPE HTML>
+{% load staticfiles %}
 <html>
     <head>
-      <title>Welcome to WTab 2</title>
+      <title>WTab 2</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+      <script src="{% static "script/jquery-1.11.2.js" %}"></script>
+      <script src="{% static "bootstrap/script/bootstrap.min.js" %}"></script>
     </head>
     <body>
-        <form id="code_input" method="post" action="">
-          {% csrf_token %}
-          {{form}}
-          <input type="submit" name="submit" value="Get This Round's Ballot">
-        </form>
-        <br>
-        <a href="/tournament/matchup/{{n}}">View Current Matchups</a>
+        <nav class="navbar navbar-default navbar-fixed-top">
+          <div class="container">
+            <div class="navbar-header">
+              <a href="/tournament/" class="navbar-brand">{{tournament_name}}</a>
+            </div>
+            <ul class="nav navbar-nav">
+              <li>
+                <a>Registration</a>
+              </li>
+              <li>
+                <a>Tournament</a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        <div class="jumbotron">
+          <div class="container">
+            <h1>Welcome to {{tournament_name}}</h1>
+            <p>A WSDC tournament with WTab 2</p>
+          </div>
+        </div>
+
+        <div class="container">
+          <form id="code_input" method="post" action="">
+            {% csrf_token %}
+            {{form}}
+            <input type="submit" name="submit" class="btn btn-primary" value="Get This Round's Ballot">
+          </form>
+          <br>
+          <a href="/tournament/matchup/{{n}}">View Current Matchups</a>
+          <br>
+          <br>
+          <a href="/admin">Go to Admin Site</a>
+        </div>
+        <hr>
+        <div class="container">
+          <a href="https://github.com/kerbinagent/tabpy2">View Code on GitHub</a>
+        </div>
     </body>
 </html>

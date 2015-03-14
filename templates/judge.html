@@ -1,71 +1,67 @@
 <!DOCTYPE HTML>
+{% load staticfiles %}
 <html>
     <head>
       <title>WTab 2</title>
-      <style>
-      table, th, td {
-        border: 1px solid black;
-        border-collapse: collapse;
-      }
-      th, td {
-        padding: 5px;
-      }
-      th {
-        text-align: center;
-      }
-      </style>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+      <script src="{% static "script/jquery-1.11.2.js" %}"></script>
+      <script src="{% static "bootstrap/script/bootstrap.min.js" %}"></script>
     </head>
     <body>
-      <h1>Round {{round_number}} Ballot</h1>
-      {% if judge_name %}
-        <h2>Welcome {{judge_name}}</h2>
-        <br>
-        {% if round_check %}
-        <form id="ballot" method="post" action="">
-          {% csrf_token %}
-          <table>
-            <tr>
-              <th colspan="2">
-                {{prop_team}}
-              </th>
-              <th colspan="2">
-                {{oppo_team}}
-              </th>
-            </tr>
-            <tr>
-              <td>{{p1.name}}</td>
-              <td>{{form.prop_1}}</td>
-              <td>{{o1.name}}</td>
-              <td>{{form.oppo_1}}</td>
-            </tr>
-            <tr>
-              <td>{{p2.name}}</td>
-              <td>{{form.prop_2}}</td>
-              <td>{{o2.name}}</td>
-              <td>{{form.oppo_2}}</td>
-            </tr>
-            <tr>
-              <td>{{p3.name}}</td>
-              <td>{{form.prop_3}}</td>
-              <td>{{o3.name}}</td>
-              <td>{{form.oppo_3}}</td>
-            </tr>
-            <tr>
-              <td>Prop Reply</td>
-              <td>{{form.prop_reply}}</td>
-              <td>Oppo Reply</td>
-              <td>{{form.oppo_reply}}</td>
-            </tr>
-          </table>
-          <br>
-          <input type="submit" name="submit" value="Submit Ballot">
-        </form>
+      <div class="container">
+        <h1>Round {{round_number}} Ballot</h1>
+        {% if judge_name %}
+          <h2>Welcome {{judge_name}}</h2>
+          <hr>
+          {% if round_check %}
+          <form id="ballot" method="post" action="">
+            {% csrf_token %}
+            <table class="table table-striped">
+              <tr>
+                <th colspan="2">
+                  {{prop_team}}
+                </th>
+                <th colspan="2">
+                  {{oppo_team}}
+                </th>
+              </tr>
+              <tr>
+                <td>{{p1.name}}</td>
+                <td>{{form.prop_1}}</td>
+                <td>{{o1.name}}</td>
+                <td>{{form.oppo_1}}</td>
+              </tr>
+              <tr>
+                <td>{{p2.name}}</td>
+                <td>{{form.prop_2}}</td>
+                <td>{{o2.name}}</td>
+                <td>{{form.oppo_2}}</td>
+              </tr>
+              <tr>
+                <td>{{p3.name}}</td>
+                <td>{{form.prop_3}}</td>
+                <td>{{o3.name}}</td>
+                <td>{{form.oppo_3}}</td>
+              </tr>
+              <tr>
+                <td>Prop Reply</td>
+                <td>{{form.prop_reply}}</td>
+                <td>Oppo Reply</td>
+                <td>{{form.oppo_reply}}</td>
+              </tr>
+            </table>
+            <br>
+            <input type="submit" name="submit" class="btn btn-primary" value="Submit Ballot">
+          </form>
+          {% else %}
+            <strong>You can rest this round :-)</strong>
+          {% endif %}
         {% else %}
-          <strong>You can rest this round :-)</strong>
+          <hr>
+          <h2>judge code is incorrect</h2>
+          <a href="/tournament/">Try again</a>
         {% endif %}
-      {% else %}
-        <h2>judge code is incorrect</h2>
-        <a href="/tournament/">Try again</a>
-      {% endif %}
+      </div>
     </body>
 </html>

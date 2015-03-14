@@ -75,6 +75,7 @@ class Room_Stat(models.Model):
         return ("Round "+str(self.round_number)+" in "+str(self.room_id))
 
 class Tournament_Settings(models.Model):
+    Name_of_Tournament = models.CharField(max_length=64, default="new tournament")
     Max_Margin = models.IntegerField(default=300)
     Total_Rounds = models.IntegerField(default=8)
     Novice_Breaks = models.IntegerField(default=4)

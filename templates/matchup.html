@@ -1,22 +1,15 @@
 <!DOCTYPE HTML>
+{% load staticfiles %}
 <html>
     <head>
       <title>WTab 2</title>
-      <style>
-      table, th, td {
-        border: 1px solid black;
-        border-collapse: collapse;
-      }
-      th, td {
-        padding: 5px;
-      }
-      th {
-        text-align: left;
-      }
-      </style>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+      <script src="{% static "script/jquery-1.11.2.js" %}"></script>
+      <script src="{% static "bootstrap/script/bootstrap.min.js" %}"></script>
     </head>
     <body>
-      <table>
+      <table class="table table-striped">
         <tr>
           <th>Prop</th>
           <th>Oppo</th>

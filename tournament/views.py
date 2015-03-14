@@ -4,8 +4,11 @@ from tournament.forms import CodeForm, JudgeBallot
 from django.http import HttpResponseRedirect, HttpResponse
 #Judge code input
 def index(request):
+    initiate = Room_Stat.objects.get_or_create(round_number=0, prop_team=Team.objects.all()[0],oppo_team=Team.objects.all()[1], chair=Judge.objects.all()[0],room_id=Room.objects.all()[0])
     n = Room_Stat.objects.order_by('-round_number')[0]
     n = n.round_number
+    if n==0:
+        return (HttpResponseRedirect('/tournament/initiate_matchup'))
     if request.method == "POST":
         form = CodeForm(request.POST)
         if form.is_valid():
@@ -15,6 +18,7 @@ def index(request):
         form = CodeForm()
     context_dict = {'form':form}
     context_dict['n'] = str(n)
+    context_dict['tournament_name'] = Tournament_Settings.objects.all()[0].Name_of_Tournament
     return (render(request,'index.html',context_dict))
 
 #Ballot for Judge
@@ -77,13 +81,14 @@ def judge(request,judge_code):
             margin_limit = Tournament_Settings.objects.all()[0]
             margin_limit = margin_limit.Max_Margin
             flag = False
-            for score in form.cleaned_data:
-                if score > 100:
+            speech_score = [form.cleaned_data['prop_1'],form.cleaned_data['prop_2'],form.cleaned_data['prop_3'],form.cleaned_data['oppo_2'],form.cleaned_data['oppo_1'],form.cleaned_data['oppo_3']]
+            for score in speech_score:
+                if score >85 or score < 65:
                     flag = True
-                if score < 30:
-                    flag = True
-            if form.cleaned_data['prop_reply']>50 or form.cleaned_data['oppo_reply']>50:
-                flag= True
+            reply_score = [form.cleaned_data['prop_reply'],form.cleaned_data['oppo_reply']]
+            for score in reply_score:
+                if score > 40 or score < 30:
+                    flag=True
             if flag:
                 return (HttpResponse("Score out of limit <br> <a href='/tournament/'>Try Again</a>"))
             if (prop_sum - oppo_sum) * (prop_sum - oppo_sum) > margin_limit * margin_limit:
@@ -137,6 +142,9 @@ def judge(request,judge_code):
             point_object.point = form.cleaned_data['oppo_3']
             point_object.save()
             o3.save()
+
+            judge.round_filled = n
+            judge.save()
 
             #Detect Need to Matchup
             if len(SpeakerPoint.objects.filter(round_number=n)) == Speaker.objects.count():
@@ -223,8 +231,7 @@ def matchup(request):
         room_stat.save()
         i+=1
     #Pretending to be cute
-    test_str = "Done! Haha I am Smart!"
-    return (HttpResponse(test_str))
+    return (HttpResponseRedirect('/tournament/'))
 
 def show_matchup(request, round_number):
     room_stat = Room_Stat.objects.filter(round_number=int(round_number))

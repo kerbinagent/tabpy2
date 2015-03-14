@@ -102,6 +102,7 @@ class Migration(migrations.Migration):
             name='Tournament_Settings',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('Name_of_Tournament', models.CharField(default=b'new tournament', max_length=64)),
                 ('Max_Margin', models.IntegerField(default=300)),
                 ('Total_Rounds', models.IntegerField(default=8)),
                 ('Novice_Breaks', models.IntegerField(default=4)),
