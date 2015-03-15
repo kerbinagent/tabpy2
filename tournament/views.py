@@ -14,6 +14,8 @@ def index(request):
         if form.is_valid():
             redirect = '/tournament/judge/'+form.cleaned_data['code']
             return HttpResponseRedirect(redirect)
+        else:
+            context_dict={'form':form}
     else:
         form = CodeForm()
     context_dict = {'form':form}
@@ -34,8 +36,6 @@ def judge(request,judge_code):
         context_dict={'judge_name':None}
     n = Room_Stat.objects.order_by('-round_number')[0]
     n = n.round_number
-    if judge.round_filled == n:
-        return (HttpResponse("You have already turned in ballot. <br> <a href='/tournament'>Click to return</a>"))
     context_dict['round_number']=str(n)
     #Get Match-up Data to display
     if judge:
@@ -78,21 +78,7 @@ def judge(request,judge_code):
             #Team Score
             prop_sum = form.cleaned_data['prop_1']+form.cleaned_data['prop_2']+form.cleaned_data['prop_3']+form.cleaned_data['prop_reply']
             oppo_sum = form.cleaned_data['oppo_1']+form.cleaned_data['oppo_2']+form.cleaned_data['oppo_3']+form.cleaned_data['oppo_reply']
-            margin_limit = Tournament_Settings.objects.all()[0]
-            margin_limit = margin_limit.Max_Margin
-            flag = False
-            speech_score = [form.cleaned_data['prop_1'],form.cleaned_data['prop_2'],form.cleaned_data['prop_3'],form.cleaned_data['oppo_2'],form.cleaned_data['oppo_1'],form.cleaned_data['oppo_3']]
-            for score in speech_score:
-                if score >85 or score < 65:
-                    flag = True
-            reply_score = [form.cleaned_data['prop_reply'],form.cleaned_data['oppo_reply']]
-            for score in reply_score:
-                if score > 40 or score < 30:
-                    flag=True
-            if flag:
-                return (HttpResponse("Score out of limit <br> <a href='/tournament/'>Try Again</a>"))
-            if (prop_sum - oppo_sum) * (prop_sum - oppo_sum) > margin_limit * margin_limit:
-                return (HttpResponse("Margin Too Big <br> <a href='/tournament/'>Try Again</a>"))
+
             if prop_sum > oppo_sum:
                 prop_team.total_wl +=1
             else:
@@ -151,8 +137,10 @@ def judge(request,judge_code):
                 return (HttpResponseRedirect('/tournament/initiate_matchup'))
             else:
                 return (HttpResponseRedirect('/tournament/'))
-
-    context_dict['form'] = JudgeBallot()
+        else:
+            context_dict['form'] = form
+    else:
+        context_dict['form'] = JudgeBallot()
     return (render(request,'judge.html',context_dict))
 
 #Match Up

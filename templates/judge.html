@@ -15,6 +15,22 @@
           <h2>Welcome {{judge_name}}</h2>
           <hr>
           {% if round_check %}
+          {% if form.non_field_errors %}
+            {% for err in form.non_field_errors %}
+              <div class="alert alert-danger" role="alert">
+                <strong>{{err}}</strong>
+              </div>
+            {% endfor %}
+          {% endif %}
+          {% for field in form.visible_fields %}
+            {% if field.errors %}
+              {% for err in field.errors %}
+                <div class="alert alert-danger" role="alert">
+                  <strong>{{err}}</strong>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
           <form id="ballot" method="post" action="">
             {% csrf_token %}
             <table class="table table-striped">
@@ -57,10 +73,6 @@
           {% else %}
             <strong>You can rest this round :-)</strong>
           {% endif %}
-        {% else %}
-          <hr>
-          <h2>judge code is incorrect</h2>
-          <a href="/tournament/">Try again</a>
         {% endif %}
       </div>
     </body>

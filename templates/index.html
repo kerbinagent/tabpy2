@@ -32,20 +32,53 @@
         </div>
 
         <div class="container">
-          <form id="code_input" method="post" action="">
-            {% csrf_token %}
-            {{form}}
-            <input type="submit" name="submit" class="btn btn-primary" value="Get This Round's Ballot">
-          </form>
-          <br>
-          <a href="/tournament/matchup/{{n}}">View Current Matchups</a>
-          <br>
-          <br>
-          <a href="/admin">Go to Admin Site</a>
+          <div class="col-md-4">
+            <h3>For Judges</h3>
+            <br>
+            {% for field in form.visible_fields %}
+              {% if field.errors %}
+                {% for err in field.errors %}
+                  <div class="alert alert-danger" role="alert">
+                    <strong>{{err}}</strong>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+            <p>
+              We have brilliant online ballots so you don't have to figure out the total speaker scores. Just enter your assigned judge code below to get started.
+            </p>
+            <br>
+            <form id="code_input" method="post" action="">
+              {% csrf_token %}
+              {{form.code}}
+              <input type="submit" name="submit" class="btn btn-primary" value="Get This Round's Ballot">
+            </form>
+          </div>
+          <div class="col-md-4">
+            <h3>For Debaters</h3>
+            <br>
+            <p>
+              You can view matchup and view full tab (when tournament finishes) here. Click Button(s) below to get started.
+            </p>
+            <br>
+            <a href="/tournament/matchup/{{n}}" class="btn btn-primary">View Current Matchups</a>
+          </div>
+          <div class="col-md-4">
+            <h3>For Admin</h3>
+            <br>
+            <p>
+              We offer unparalled speed for tabbing. Tabbing shouldn't consume possible time for quality debates. Manage your tournament here:
+            </p>
+            <br>
+            <a href="/admin" class="btn btn-primary">Go to Admin Site</a>
+            <a class="btn btn-primary">Check Judge Status</a>
+          </div>
         </div>
         <hr>
         <div class="container">
-          <a href="https://github.com/kerbinagent/tabpy2">View Code on GitHub</a>
+          WTab, published under GNU General Pulbic License v2 by Houze Wang
+          <br>
+          <a href="https://github.com/kerbinagent/tabpy2">Find it on GitHub</a>
         </div>
     </body>
 </html>
