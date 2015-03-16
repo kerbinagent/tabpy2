@@ -4,7 +4,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tabpy2.settings')
 import django
 django.setup()
 
-from tournament.models import School,Team,Speaker,Judge,Room
+from tournament.models import School,Team,Speaker,Judge,Room, Tournament_Settings
 
 def add_school(name):
     school = School.objects.get_or_create(name=name)[0]
@@ -59,3 +59,7 @@ while i<6:
 add_judge('Water Judge')
 
 add_Room('111')
+
+t = Tournament_Settings.objects.get_or_create()[0]
+
+t.save()

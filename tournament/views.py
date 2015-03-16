@@ -21,11 +21,13 @@ def index(request):
     context_dict = {'form':form}
     context_dict['n'] = str(n)
     context_dict['tournament_name'] = Tournament_Settings.objects.all()[0].Name_of_Tournament
+    context_dict['tab_released'] = Tournament_Settings.objects.all()[0].Tab_Released
     return (render(request,'index.html',context_dict))
 
 #Ballot for Judge
 def judge(request,judge_code):
     #Get Judge name
+    tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
     try:
         judge=Judge.objects.get(code=judge_code)
     except Judge.DoesNotExist:
@@ -37,6 +39,7 @@ def judge(request,judge_code):
     n = Room_Stat.objects.order_by('-round_number')[0]
     n = n.round_number
     context_dict['round_number']=str(n)
+    context_dict['tournament_name']=tournament_name
     #Get Match-up Data to display
     if judge:
         try:
@@ -221,7 +224,37 @@ def matchup(request):
     #Pretending to be cute
     return (HttpResponseRedirect('/tournament/'))
 
+def show_tab(request):
+    team_all = Team.objects.order_by('-total_wl','-total_sp','-total_mg')
+    speaker_all = Speaker.objects.order_by('-total_sp')
+    team_novice = Team.objects.filter(novice=True).order_by('-total_wl','-total_sp','-total_mg')
+    speaker_novice = Speaker.objects.filter(novice=True).order_by('-total_sp')
+    context_dict = {
+    'team_all':team_all,
+    'speaker_all':speaker_all,
+    'team_novice':team_novice,
+    'speaker_novice':speaker_novice}
+    tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
+    context_dict['tournament_name'] = tournament_name
+    context_dict['Tab_Released'] = Tournament_Settings.objects.all()[0].Tab_Released
+
+    return (render(request,'show_tab.html',context_dict))
+
+def judge_check(request):
+    n = Room_Stat.objects.order_by('-round_number')[0]
+    n = n.round_number
+    try:
+        judge_list = Judge.objects.filter(round_filled=n-1)
+    except Judge.DoesNotExist:
+        judge_list = None
+    tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
+    context_dict = {'judge_list':judge_list}
+    context_dict['tournament_name'] = tournament_name
+    return (render(request,'judge_check.html',context_dict))
+
 def show_matchup(request, round_number):
     room_stat = Room_Stat.objects.filter(round_number=int(round_number))
     context_dict = {'room_stat':room_stat}
+    tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
+    context_dict['tournament_name'] = tournament_name
     return (render(request,'matchup.html',context_dict))

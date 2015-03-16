@@ -1,29 +1,21 @@
-<!DOCTYPE HTML>
-{% load staticfiles %}
-<html>
-    <head>
-      <title>WTab 2</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-      <script src="{% static "script/jquery-1.11.2.js" %}"></script>
-      <script src="{% static "bootstrap/script/bootstrap.min.js" %}"></script>
-    </head>
-    <body>
-      <table class="table table-striped">
-        <tr>
-          <th>Prop</th>
-          <th>Oppo</th>
-          <th>Room</th>
-          <th>Chair</th>
-        </tr>
-        {% for room in room_stat %}
-          <tr>
-            <td>{{room.prop_team}}</td>
-            <td>{{room.oppo_team}}</td>
-            <td>{{room.room_id}}</td>
-            <td>{{room.chair}}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    </body>
-</html>
+{% extends 'base.html' %}
+{% block body_block %}
+<div class="container">
+  <table class="table table-striped">
+    <tr>
+      <th>Prop</th>
+      <th>Oppo</th>
+      <th>Room</th>
+      <th>Chair</th>
+    </tr>
+    {% for room in room_stat %}
+      <tr>
+        <td>{{room.prop_team}}</td>
+        <td>{{room.oppo_team}}</td>
+        <td>{{room.room_id}}</td>
+        <td>{{room.chair}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

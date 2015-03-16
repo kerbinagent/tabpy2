@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block body_block %}
+  {% if judge_list %}
+  <div class="container">
+    <div class="alert alert-info">
+      <strong>Ballot(s) from the following judge(s) is/are missing:</strong>
+    </div>
+    <ul>
+      {%for judge in judge_list%}
+      <li>{{judge}}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% else %}
+  <div class="container">
+    <div class="alert alert-success">
+      <strong>All Ballots collected</strong>
+    </div>
+  </div>
+  {% endif %}
+  <div class="container">
+    <a href="/tournament/" class="btn btn-primary">Click to Return</a>
+  </div>
+{% endblock %}

@@ -104,9 +104,12 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('Name_of_Tournament', models.CharField(default=b'new tournament', max_length=64)),
                 ('Max_Margin', models.IntegerField(default=300)),
+                ('Score_Max', models.IntegerField(default=90)),
+                ('Score_Min', models.IntegerField(default=60)),
                 ('Total_Rounds', models.IntegerField(default=8)),
                 ('Novice_Breaks', models.IntegerField(default=4)),
                 ('Breaks', models.IntegerField(default=16)),
+                ('Tab_Released', models.BooleanField(default=False)),
             ],
             options={
             },

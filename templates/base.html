@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+{% load staticfiles %}
+<html>
+    <head>
+      <title>WTab 2</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+      <script src="{% static 'script/jquery-1.11.2.js' %}"></script>
+      <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+      <style>
+      body {
+        min-height: 900px;
+        padding-top: 70px;
+      }
+      </style>
+    </head>
+    <body>
+      <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand">{{tournament_name}}</a>
+          </div>
+          <ul class="nav navbar-nav">
+            <li>
+              <a>Tournament Info</a>
+            </li>
+            <li>
+              <a>Registration</a>
+            </li>
+            <li>
+              <a href="/tournament/">Tournament</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      {% block body_block %}{% endblock %}
+      <hr>
+      <div class="container">
+        WTab, published under GNU General Pulbic License v2 by Houze Wang
+        <br>
+        <a href="https://github.com/kerbinagent/tabpy2">Find it on GitHub</a>
+      </div>
+    </body>
+</html>

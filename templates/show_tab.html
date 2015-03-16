@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<div class="container">
+  <div class="page-header">
+    <h1>The Tab <small>View Scores online</small></h1>
+  </div>
+  {% if Tab_Released %}
+  <small>
+    Please select options below to view the tab
+  </small>
+  <div class="row">
+    <div class="col-md-4">
+      <h3>Teams</h3>
+      <a class="btn btn-primary" data-toggle="collapse" href="#allteam" aria-expanded="false" aria-controls="allteam">
+        All Teams</a>
+      <a class="btn btn-primary" data-toggle="collapse" href="#noviceteam" aria-expanded="false" aria-controls="noviceteam">
+        Novice Teams</a>
+    </div>
+    <div class="col-md-4">
+      <h3>Speakers</h3>
+      <a class="btn btn-primary" data-toggle="collapse" href="#allspeaker" aria-expanded="false" aria-controls="allspeaker">
+        All Speakers</a>
+      <a class="btn btn-primary" data-toggle="collapse" href="#novicespeaker" aria-expanded="false" aria-controls="novicespeaker">
+        Novice Speakers</a>
+    </div>
+    <div class="col-md-4">
+      <h3>Custom Tab</h3>
+      <strong>Check it later as we finish it</strong>
+    </div>
+  </div>
+  <div id="allteam" class="collapse">
+    <hr>
+    <small>Team Ranking from high to low</small>
+    <table class="table table-striped">
+      <tr>
+        <th>Team Name</th>
+        <th>School</th>
+        <th>Total Wins</th>
+        <th>Total Speaker Score</th>
+        <th>Total Margin</th>
+      </tr>
+      {% for team in team_all %}
+      <tr>
+        <td>{{team.name}}</td>
+        <td>{{team.school}}</td>
+        <td>{{team.total_wl}}</td>
+        <td>{{team.total_sp}}</td>
+        <td>{{team.total_mg}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div id="noviceteam" class="collapse">
+    <hr>
+    {% if team_novice %}
+    <small>Novice Team Ranking from high to low</small>
+    <table class="table table-striped">
+      <tr>
+        <th>Team Name</th>
+        <th>School</th>
+        <th>Total Wins</th>
+        <th>Total Speaker Score</th>
+        <th>Total Margin</th>
+      </tr>
+      {% for team in team_novice %}
+      <tr>
+        <td>{{team.name}}</td>
+        <td>{{team.school}}</td>
+        <td>{{team.total_wl}}</td>
+        <td>{{team.total_sp}}</td>
+        <td>{{team.total_mg}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <div class="alert alert-warning">
+      <strong>No Novice Teams Found</strong>
+    </div>
+    {% endif %}
+  </div>
+  <div id="allspeaker" class="collapse">
+    <hr>
+    <table class="table table-striped">
+      <tr>
+        <th>Name</th>
+        <th>Team</th>
+        <th>School</th>
+        <th>Speaker Points</th>
+      </tr>
+      {% for speaker in speaker_all %}
+      <tr>
+        <td>{{speaker.name}}</td>
+        <td>{{speaker.team}}</td>
+        <td>{{speaker.school}}</td>
+        <td>{{speaker.total_sp}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div id="novicespeaker" class="collapse">
+    <hr>
+    {% if speaker_novice %}
+    <table class="table table-striped">
+      <tr>
+        <th>Name</th>
+        <th>Team</th>
+        <th>School</th>
+        <th>Speaker Points</th>
+      </tr>
+      {% for speaker in speaker_novice %}
+      <tr>
+        <td>{{speaker.name}}</td>
+        <td>{{speaker.team}}</td>
+        <td>{{speaker.school}}</td>
+        <td>{{speaker.total_sp}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <div class="alert alert-warning">
+      <strong>No Novice Speakers Found</strong>
+    </div>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="alert alert-warning">
+    <strong>Tab not released yet. Come back later</strong>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

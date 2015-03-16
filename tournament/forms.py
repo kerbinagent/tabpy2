@@ -11,6 +11,8 @@ def judgevalidator(code):
             raise ValidationError("You Have Already Turned in Ballot")
     except Judge.DoesNotExist:
         raise ValidationError("Judge Code Incorrect")
+    if Tournament_Settings.objects.all()[0].Tab_Released:
+        raise ValidationError("Tournament has ended")
 
 class CodeForm(forms.Form):
     code = forms.CharField(max_length=8, validators=[judgevalidator])
@@ -18,11 +20,13 @@ class CodeForm(forms.Form):
 
 
 def scorevalidator(score):
-    if score > 85 or score < 65:
+    settings = Tournament_Settings.objects.all()[0]
+    if score > settings.Score_Max or score < settings.Score_Min:
         raise ValidationError("Score out of range")
 
 def replyvalidator(score):
-    if score > 45 or score < 27:
+    settings = Tournament_Settings.objects.all()[0]
+    if score > settings.Score_Max/2 or score < score < settings.Score_Min/2:
         raise ValidationError("Reply Score out of range")
 
 class JudgeBallot(forms.Form):

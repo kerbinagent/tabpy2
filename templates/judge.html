@@ -1,14 +1,7 @@
-<!DOCTYPE HTML>
-{% load staticfiles %}
-<html>
-    <head>
-      <title>WTab 2</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-      <script src="{% static "script/jquery-1.11.2.js" %}"></script>
-      <script src="{% static "bootstrap/script/bootstrap.min.js" %}"></script>
-    </head>
-    <body>
+{% extends 'base.html' %}
+
+{% block body_block %}
+
       <div class="container">
         <h1>Round {{round_number}} Ballot</h1>
         {% if judge_name %}
@@ -75,5 +68,5 @@
           {% endif %}
         {% endif %}
       </div>
-    </body>
-</html>
+
+{% endblock %}

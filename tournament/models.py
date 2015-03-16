@@ -77,9 +77,12 @@ class Room_Stat(models.Model):
 class Tournament_Settings(models.Model):
     Name_of_Tournament = models.CharField(max_length=64, default="new tournament")
     Max_Margin = models.IntegerField(default=300)
+    Score_Max = models.IntegerField(default=90)
+    Score_Min = models.IntegerField(default=60)
     Total_Rounds = models.IntegerField(default=8)
     Novice_Breaks = models.IntegerField(default=4)
     Breaks = models.IntegerField(default=16)
+    Tab_Released = models.BooleanField(default=False)
 
     def __unicode__(self):
         return ("Global Setting for Tournament")
