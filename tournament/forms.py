@@ -30,6 +30,10 @@ def replyvalidator(score):
         raise ValidationError("Reply Score out of range")
 
 class JudgeBallot(forms.Form):
+    winner_choice = (
+    ('p','Proposition'),
+    ('o','Opposition'),
+    )
     prop_1 = forms.IntegerField(validators=[scorevalidator])
     prop_2 = forms.IntegerField(validators=[scorevalidator])
     prop_3 = forms.IntegerField(validators=[scorevalidator])
@@ -38,6 +42,7 @@ class JudgeBallot(forms.Form):
     oppo_2 = forms.IntegerField(validators=[scorevalidator])
     oppo_3 = forms.IntegerField(validators=[scorevalidator])
     oppo_reply = forms.FloatField(validators=[replyvalidator])
+    winner = forms.ChoiceField(choices = winner_choice, required=True)
 
     def clean(self):
         form_data = self.cleaned_data
@@ -65,4 +70,8 @@ class JudgeBallot(forms.Form):
             oppo_sum = self.cleaned_data['oppo_1']+self.cleaned_data['oppo_2']+self.cleaned_data['oppo_3']+self.cleaned_data['oppo_reply']
             if abs(prop_sum - oppo_sum) > margin_limit:
                 raise ValidationError("Margin Out of Limit")
+            if (prop_sum > oppo_sum and self.cleaned_data['winner'] == 'o') or (prop_sum < oppo_sum and self.cleaned_data['winner'] == 'p'):
+                raise ValidationError("Winner has lower scores. Check your ballot again")
+            if (prop_sum == oppo_sum):
+                raise ValidationError("The score on prop and oppo is the same. You must choose a winner")
         return (self.cleaned_data)

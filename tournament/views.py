@@ -221,7 +221,6 @@ def matchup(request):
         room_stat = Room_Stat.objects.get_or_create(round_number=n_int+1, chair=judge_list[i], prop_team=pair_list[i][0], oppo_team=pair_list[i][1], room_id=room_list[i])[0]
         room_stat.save()
         i+=1
-    #Pretending to be cute
     return (HttpResponseRedirect('/tournament/'))
 
 def show_tab(request):
@@ -249,6 +248,7 @@ def judge_check(request):
         judge_list = None
     tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
     context_dict = {'judge_list':judge_list}
+    context_dict['round_number'] = n
     context_dict['tournament_name'] = tournament_name
     return (render(request,'judge_check.html',context_dict))
 
@@ -257,4 +257,5 @@ def show_matchup(request, round_number):
     context_dict = {'room_stat':room_stat}
     tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
     context_dict['tournament_name'] = tournament_name
+    context_dict['round_number'] = room_stat[0].round_number
     return (render(request,'matchup.html',context_dict))

@@ -24,6 +24,9 @@
               {% endfor %}
             {% endif %}
           {% endfor %}
+          <div class="alert alert-warning">
+            <strong>Warning!</strong> The sequence of the speaker shown in the ballot is not in the order of speech. Make sure you give the right score to the right speaker!
+          </div>
           <form id="ballot" method="post" action="">
             {% csrf_token %}
             <table class="table table-striped">
@@ -61,10 +64,18 @@
               </tr>
             </table>
             <br>
+            <div class="well well-sm">
+              <p>
+                Please Confirm Winner: {{form.winner}}
+              </p>
+            </div>
+            <br>
             <input type="submit" name="submit" class="btn btn-primary" value="Submit Ballot">
           </form>
           {% else %}
-            <strong>You can rest this round :-)</strong>
+            <div class="alert alert-info">
+              You can rest this round :-)
+            </div>
           {% endif %}
         {% endif %}
       </div>
