@@ -11,6 +11,9 @@ class School(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=64, unique=True)
     school = models.ForeignKey(School)
+    contact_person = models.CharField(default="None",max_length=32)
+    contact_number = models.IntegerField(default=10000)
+    contact_email = models.EmailField(default="example@example.com")
     total_wl = models.IntegerField(default=0)
     total_po = models.IntegerField(default=0)
     po_str = models.CharField(max_length=32, default="", blank=True)

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<div class="container">
+  <div class="page-header">
+    <h1>Registration<small>Register Teams here</small></h1>
+  </div>
+  {% if form.non_field_errors %}
+    {% for err in form.non_field_errors %}
+      <div class="alert alert-danger" role="alert">
+        <strong>{{err}}</strong>
+      </div>
+    {% endfor %}
+  {% endif %}
+  <form method="POST" action="" class="form">
+    {% csrf_token %}
+
+    {% for field in form.visible_fields %}
+      <div class="form-group">
+        {{field.help_text}}
+        {{field}}
+        {{field.errors}}
+      </div>
+    {% endfor %}
+
+    {% for field in sform.visible_fields %}
+      <div class="form-group">
+        {{field.help_text}}
+        {{field}}
+        {{field.errors}}
+      </div>
+    {% endfor %}
+
+    <input type="submit" class="btn btn-primary" value="Register">
+  </form>
+</div>
+{% endblock %}
