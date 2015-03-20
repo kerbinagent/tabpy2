@@ -16,6 +16,7 @@ class Team(models.Model):
     contact_email = models.EmailField(default="example@example.com")
     total_wl = models.IntegerField(default=0)
     total_po = models.IntegerField(default=0)
+    total_ballots = models.IntegerField(default=0)
     po_str = models.CharField(max_length=32, default="", blank=True)
     total_sp = models.FloatField(default=0)
     total_mg = models.FloatField(default=0)
@@ -86,6 +87,7 @@ class Tournament_Settings(models.Model):
     Novice_Breaks = models.IntegerField(default=4)
     Breaks = models.IntegerField(default=16)
     Tab_Released = models.BooleanField(default=False)
+    Registration_Open = models.BooleanField(default=True)
 
     def __unicode__(self):
         return ("Global Setting for Tournament")

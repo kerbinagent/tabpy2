@@ -4,6 +4,7 @@
   <div class="page-header">
     <h1>Registration<small>Register Teams here</small></h1>
   </div>
+  {% if registration_open %}
   {% if form.non_field_errors %}
     {% for err in form.non_field_errors %}
       <div class="alert alert-danger" role="alert">
@@ -32,5 +33,10 @@
 
     <input type="submit" class="btn btn-primary" value="Register">
   </form>
+  {% else %}
+  <div class="alert alert-danger">
+    <strong>Registration has already closed</strong>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}

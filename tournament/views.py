@@ -81,11 +81,22 @@ def judge(request,judge_code):
             #Team Score
             prop_sum = form.cleaned_data['prop_1']+form.cleaned_data['prop_2']+form.cleaned_data['prop_3']+form.cleaned_data['prop_reply']
             oppo_sum = form.cleaned_data['oppo_1']+form.cleaned_data['oppo_2']+form.cleaned_data['oppo_3']+form.cleaned_data['oppo_reply']
-
+            split = form.cleaned_data['split']
             if prop_sum > oppo_sum:
                 prop_team.total_wl +=1
+                if split:
+                    prop_team.total_ballots += 2
+                    oppo_team.total_ballots += 1
+                else:
+                    prop_team.total_ballots += 3
             else:
                 oppo_team.total_wl +=1
+                if split:
+                    oppo_team.total_ballots += 2
+                    prop_team.total_ballots += 1
+                else:
+                    oppo_team.total_ballots += 3
+
             prop_team.total_po +=1
             prop_team.total_sp += prop_sum
             oppo_team.total_sp += oppo_sum

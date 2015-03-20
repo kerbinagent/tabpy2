@@ -13,6 +13,9 @@ def judgevalidator(code):
         raise ValidationError("Judge Code Incorrect")
     if Tournament_Settings.objects.all()[0].Tab_Released:
         raise ValidationError("Tournament has ended")
+    registration_open = Tournament_Settings.objects.all()[0].Registration_Open
+    if registration_open:
+        raise ValidationError("Tournament hasn't started (Registration still open)")
 
 class CodeForm(forms.Form):
     code = forms.CharField(max_length=8, validators=[judgevalidator])
@@ -43,6 +46,7 @@ class JudgeBallot(forms.Form):
     oppo_3 = forms.IntegerField(validators=[scorevalidator])
     oppo_reply = forms.FloatField(validators=[replyvalidator])
     winner = forms.ChoiceField(choices = winner_choice, required=True)
+    split = forms.BooleanField(required=False, initial=False)
 
     def clean(self):
         form_data = self.cleaned_data

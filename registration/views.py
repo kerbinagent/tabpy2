@@ -5,6 +5,7 @@ from django.http import HttpResponse
 
 def index(request):
     tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
+    registration_setting = Tournament_Settings.objects.all()[0].Registration_Open
     if request.method == "POST":
         form = team_form(request.POST)
         sform = speaker_form(request.POST)
@@ -37,6 +38,7 @@ def index(request):
     context_dict={
     'form':form,
     'sform':sform,
-    'tournament_name': tournament_name
+    'tournament_name': tournament_name,
+    'registration_open': registration_setting
     }
     return (render(request, 'registration.html',context_dict))
