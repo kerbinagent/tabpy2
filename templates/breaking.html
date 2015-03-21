@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<div class="container">
+  {% if not valid_code %}
+
+  <div class="alert alert-danger">
+    <strong>Admin Code is Incorrect</strong>
+  </div>
+
+  {% else %}
+
+  {% if mainbreak %}
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <h3 class="panel-title">Main Break</h3>
+    </div>
+
+    <div class="panel-body">
+      <table class="table table-striped">
+        <tr>
+          <th>Team</th>
+          <th>Total Wins</th>
+          <th>Total Speaker Points</th>
+          <th>Total Margin</th>
+        </tr>
+        {% for team in mainbreak %}
+        <tr>
+          <td>{{team.name}}</td>
+          <td>{{team.total_wl}}</td>
+          <td>{{team.total_sp}}</td>
+          <td>{{team.total_mg}}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-danger">
+    <strong>Not Enough Teams to generate Mainbreak</strong>
+  </div>
+  {% endif %}
+
+  <hr>
+
+  {% if novicebreak %}
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <h3 class="panel-title">Novice Break</h3>
+    </div>
+
+    <div class="panel-body">
+      <table class="table table-striped">
+        <tr>
+          <th>Team</th>
+          <th>Total Wins</th>
+          <th>Total Speaker Points</th>
+          <th>Total Margin</th>
+        </tr>
+        {% for team in novicebreak %}
+        <tr>
+          <td>{{team.name}}</td>
+          <td>{{team.total_wl}}</td>
+          <td>{{team.total_sp}}</td>
+          <td>{{team.total_mg}}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-danger">
+    <strong>Not Enough Novice Teams to generate Novice break</strong>
+  </div>
+  {% endif %}
+
+  {% endif %}
+</div>
+{% endblock %}

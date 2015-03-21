@@ -20,7 +20,13 @@ def judgevalidator(code):
 class CodeForm(forms.Form):
     code = forms.CharField(max_length=8, validators=[judgevalidator])
 
+def adminvalidator(code):
+    correct_code = Tournament_Settings.objects.all()[0].Admin_Code
+    if code != correct_code:
+        raise ValidationError("Admin Code Incorrect")
 
+class AdminForm(forms.Form):
+    code = forms.CharField(max_length=8, validators=[adminvalidator])
 
 def scorevalidator(score):
     settings = Tournament_Settings.objects.all()[0]

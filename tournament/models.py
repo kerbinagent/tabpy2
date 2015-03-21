@@ -54,7 +54,7 @@ class Judge(models.Model):
     name = models.CharField(max_length=64, unique=True, primary_key=True)
     code = models.CharField(max_length=8, unique=True, default='CODE')
     weight = models.IntegerField(default=1)
-    round_filled = models.IntegerField(default=0)
+    round_filled = models.IntegerField(default=-1)
 
     def __unicode__(self):
         return (self.name)
@@ -88,6 +88,7 @@ class Tournament_Settings(models.Model):
     Breaks = models.IntegerField(default=16)
     Tab_Released = models.BooleanField(default=False)
     Registration_Open = models.BooleanField(default=True)
+    Admin_Code = models.CharField(default="admin",max_length=8)
 
     def __unicode__(self):
         return ("Global Setting for Tournament")

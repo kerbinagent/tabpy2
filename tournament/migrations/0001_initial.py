@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=64, unique=True, serialize=False, primary_key=True)),
                 ('code', models.CharField(default=b'CODE', unique=True, max_length=8)),
                 ('weight', models.IntegerField(default=1)),
-                ('round_filled', models.IntegerField(default=0)),
+                ('round_filled', models.IntegerField(default=-1)),
             ],
             options={
             },
@@ -115,6 +115,7 @@ class Migration(migrations.Migration):
                 ('Breaks', models.IntegerField(default=16)),
                 ('Tab_Released', models.BooleanField(default=False)),
                 ('Registration_Open', models.BooleanField(default=True)),
+                ('Admin_Code', models.CharField(default=b'admin', max_length=8)),
             ],
             options={
             },

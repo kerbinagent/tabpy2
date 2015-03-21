@@ -1,13 +1,16 @@
 from django.shortcuts import render
 from tournament.models import Judge, Room_Stat, Speaker, Team, SpeakerPoint, Room, Tournament_Settings
-from tournament.forms import CodeForm, JudgeBallot
+from tournament.forms import CodeForm, JudgeBallot, AdminForm
 from django.http import HttpResponseRedirect, HttpResponse
 #Judge code input
 def index(request):
     initiate = Room_Stat.objects.get_or_create(round_number=0, prop_team=Team.objects.all()[0],oppo_team=Team.objects.all()[1], chair=Judge.objects.all()[0],room_id=Room.objects.all()[0])
     n = Room_Stat.objects.order_by('-round_number')[0]
+    break_number = Tournament_Settings.objects.all()[0].Total_Rounds
+    registration_open = Tournament_Settings.objects.all()[0].Registration_Open
+    #Ininiate first matchup
     n = n.round_number
-    if n==0:
+    if n==0 and (not registration_open):
         return (HttpResponseRedirect('/tournament/initiate_matchup'))
     if request.method == "POST":
         form = CodeForm(request.POST)
@@ -20,6 +23,7 @@ def index(request):
         form = CodeForm()
     context_dict = {'form':form}
     context_dict['n'] = str(n)
+    context_dict['break_status'] = n > break_number
     context_dict['tournament_name'] = Tournament_Settings.objects.all()[0].Name_of_Tournament
     context_dict['tab_released'] = Tournament_Settings.objects.all()[0].Tab_Released
     return (render(request,'index.html',context_dict))
@@ -159,6 +163,9 @@ def judge(request,judge_code):
 
 #Match Up
 def matchup(request):
+    registration_open = Tournament_Settings.objects.all()[0].Registration_Open
+    if registration_open:
+        return (HttpResponseRedirect('/tournament/'))
     initiate = Room_Stat.objects.get_or_create(round_number=0, prop_team=Team.objects.all()[0],oppo_team=Team.objects.all()[1], chair=Judge.objects.all()[0],room_id=Room.objects.all()[0])
     n = Room_Stat.objects.order_by('-round_number')[0]
     n_int = n.round_number
@@ -251,19 +258,69 @@ def show_tab(request):
     return (render(request,'show_tab.html',context_dict))
 
 def judge_check(request):
+    context_dict = {}
     n = Room_Stat.objects.order_by('-round_number')[0]
     n = n.round_number
+    break_number = Tournament_Settings.objects.all()[0].Total_Rounds
+    break_status = n > break_number
+    #If Breaking available
+    if break_status:
+        if request.method == "POST":
+            form = AdminForm(request.POST)
+            if form.is_valid():
+                admin_code = form.cleaned_data['code']
+                return (HttpResponseRedirect('/tournament/breaking/'+admin_code))
+            else:
+                context_dict = {'form':form}
+        else:
+            form = AdminForm()
+        context_dict['break_status'] = break_status
+        context_dict['form'] = form
+    #If breaking not available
     try:
         judge_list = Judge.objects.filter(round_filled=n-1)
     except Judge.DoesNotExist:
         judge_list = None
     tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
-    context_dict = {'judge_list':judge_list}
+    context_dict['judge_list'] = judge_list
     context_dict['round_number'] = n
     context_dict['tournament_name'] = tournament_name
+    context_dict['break_status'] = break_status
     return (render(request,'judge_check.html',context_dict))
 
+def breaking(request, admin_code):
+    settings = Tournament_Settings.objects.all()[0]
+    correct_code = settings.Admin_Code
+    breaks = settings.Breaks
+    novice_breaks = settings.Novice_Breaks
+    context_dict = {'valid_code':admin_code==correct_code}
+    total_teams = Team.objects.order_by('-total_wl','-total_sp','-total_mg')
+    if len(total_teams) >= breaks:
+        breaking_list = total_teams[:breaks]
+    else:
+        breaking_list = None
+    rest_list = total_teams[breaks:]
+    novice_list = []
+    if len(rest_list) >= novice_breaks:
+        i=0
+        while i< len(rest_list):
+            if rest_list[i].novice:
+                novice_list.append(rest_list[i])
+            i+=1
+        if len(novice_list) < novice_breaks:
+            novice_list = None
+        else:
+            novice_list = novice_list[:novice_breaks]
+    else:
+        novice_list = None
+    context_dict['novicebreak'] = novice_list
+    context_dict['mainbreak'] = breaking_list
+    return (render(request,'breaking.html',context_dict))
+
 def show_matchup(request, round_number):
+    registration_open = Tournament_Settings.objects.all()[0].Registration_Open
+    if registration_open:
+        return (HttpResponseRedirect('/tournament/'))
     room_stat = Room_Stat.objects.filter(round_number=int(round_number))
     context_dict = {'room_stat':room_stat}
     tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament

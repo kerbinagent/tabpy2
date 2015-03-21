@@ -46,6 +46,11 @@
   <div class="col-md-4">
     <h3>For Admin</h3>
     <br>
+    {% if break_status %}
+    <div class="alert alert-success">
+      <strong>Breaking list created! Check Judge Status to view the list</strong>
+    </div>
+    {% endif %}
     <p>
       We offer unparalled speed for tabbing. Tabbing shouldn't consume possible time for quality debates. Manage your tournament here:
     </p>
