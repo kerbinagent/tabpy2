@@ -11,6 +11,7 @@ For now, you can change:
 4. The total number of breaking teams and breaking novices
 5. If the tab is released (at the bottom of all settings, check the tick after the tournament ends)
 6. Set whether registration is open
+7. Admin code: the code you need to access breaking list. Default is 'admin'. Change it as soon as possible
 ### Inputting
 Go to /admin and add a few stuff:
 1. School:
@@ -29,7 +30,9 @@ Weight is a number to denote the importance of the judge. Judges with higher wei
 You must give a room its name.
 Distance to hall is used in matchup. Better rooms are nearer to the hall. You can also ignore it and left it with its default value 0.
 ## Registration
-When registration is open, give the address /registration to debaters/institutions. Notice that you should manually register Institutions that they can choose from.
+When registration is open, give the address /registration to debaters or institutions. Notice that you should manually register Institutions that they can choose from.
+## Feedback
+You can let debaters have feedback on judges at '/feedback'. All feedbacks can be viewed from admin page
 ## Runing Tournaments
 Give the address /tournament to everyone in the tournament (judges, debaters) to run the tournament.
 ### Changing Judge for matchup
@@ -42,3 +45,5 @@ There are a number of data you should change accordingly:
 1. Go to Team, change total_sp (total speaker points) and total_wl (total wins) for BOTH prop and oppo
 2. Go to Speaker, change total_sp(total speaker points) for ALL speakers in the round
 3. Go to Speaker Point, change EVERY individual Speaker point data for ALL speakers.
+### Breaking
+When the tournament reaches the pre-set total number of preliminary rounds, you will see instruction at /tournament/ of getting the breaking list. The breaking list is available to admin only through the admin code you set.

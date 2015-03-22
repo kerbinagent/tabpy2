@@ -293,6 +293,7 @@ def breaking(request, admin_code):
     correct_code = settings.Admin_Code
     breaks = settings.Breaks
     novice_breaks = settings.Novice_Breaks
+    tournament_name = settings.Name_of_Tournament
     context_dict = {'valid_code':admin_code==correct_code}
     total_teams = Team.objects.order_by('-total_wl','-total_sp','-total_mg')
     if len(total_teams) >= breaks:
@@ -313,6 +314,7 @@ def breaking(request, admin_code):
             novice_list = novice_list[:novice_breaks]
     else:
         novice_list = None
+    context_dict['tournament_name'] = tournament_name
     context_dict['novicebreak'] = novice_list
     context_dict['mainbreak'] = breaking_list
     return (render(request,'breaking.html',context_dict))

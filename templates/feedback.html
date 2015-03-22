@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<div class="container">
+  <div class="page-header">
+    <h1>Feedback<small>we value every input</small></h1>
+  </div>
+  <form method="POST" action="">
+    {% csrf_token %}
+
+    {% for field in form.visible_fields %}
+    <div class="form-group">
+      {{field.help_text}}
+      <br>
+      {{field}}
+      {{field.errors}}
+    </div>
+    {% endfor %}
+
+    <input type="submit" class="btn btn-primary" value="Send Feedback">
+  </form>
+</div>
+{% endblock %}

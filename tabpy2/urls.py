@@ -9,5 +9,6 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^registration/',include('registration.urls')),
+    url(r'^feedback/',include('feedback.urls')),
     url(r'^tournament/', include('tournament.urls')),
 )
