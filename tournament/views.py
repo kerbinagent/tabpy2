@@ -281,6 +281,8 @@ def judge_check(request):
         judge_list = Judge.objects.filter(round_filled=n-1)
     except Judge.DoesNotExist:
         judge_list = None
+    if n == 1:
+        judge_list = Judge.objects.filter(round_filled=-1)
     tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
     context_dict['judge_list'] = judge_list
     context_dict['round_number'] = n
