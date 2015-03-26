@@ -170,6 +170,9 @@ def matchup(request):
     n = Room_Stat.objects.order_by('-round_number')[0]
     n_int = n.round_number
     n = float(n.round_number)
+    break_rounds = Tournament_Settings.objects.all()[0].Total_Rounds
+    if n_int == break_rounds:
+        return (HttpResponseRedirect('/tournament/'))
     #Rank Team and Split into brackets
     ranked_list = Team.objects.order_by('-total_wl','-total_sp','-total_mg')
     bracket_list = []
@@ -325,7 +328,10 @@ def show_matchup(request, round_number):
     registration_open = Tournament_Settings.objects.all()[0].Registration_Open
     if registration_open:
         return (HttpResponseRedirect('/tournament/'))
-    room_stat = Room_Stat.objects.filter(round_number=int(round_number))
+    try:
+        room_stat = Room_Stat.objects.filter(round_number=int(round_number))
+    except Room_Stat.DoesNotExist:
+        room_stat = None
     context_dict = {'room_stat':room_stat}
     tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
     context_dict['tournament_name'] = tournament_name

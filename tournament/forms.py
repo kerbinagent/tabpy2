@@ -35,7 +35,7 @@ def scorevalidator(score):
 
 def replyvalidator(score):
     settings = Tournament_Settings.objects.all()[0]
-    if score > settings.Score_Max/2 or score < score < settings.Score_Min/2:
+    if score > settings.Score_Max/2 or score < settings.Score_Min/2:
         raise ValidationError("Reply Score out of range")
 
 class JudgeBallot(forms.Form):
