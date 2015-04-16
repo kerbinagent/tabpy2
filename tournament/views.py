@@ -49,13 +49,8 @@ def judge(request,judge_code):
         try:
             round_match = Room_Stat.objects.get(chair=judge.name, round_number=n)
         except Room_Stat.DoesNotExist:
-            try:
-                round_match = Room_Stat.objects.get(panel1=judge.name, round_number=n)
-            except Room_Stat.DoesNotExist:
-                try:
-                    round_match = Room_Stat.objects.get(panel2=judge.name, round_number=n)
-                except Room_Stat.DoesNotExist:
-                    round_match = None
+            context_dict['judge_name'] = None
+            round_match = None
     else:
         round_match = None
     if round_match:

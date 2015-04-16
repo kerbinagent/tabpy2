@@ -76,11 +76,14 @@
             <br>
             <input type="submit" name="submit" class="btn btn-primary" value="Submit Ballot">
           </form>
-          {% else %}
+          {% endif %}
+        {% else %}
             <div class="alert alert-info">
               You can rest this round :-)
             </div>
-          {% endif %}
+            <div>
+              <small>if you are one of the panels, please give your decision to the chair</small>
+            </div>
         {% endif %}
       </div>
 
