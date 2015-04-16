@@ -2,8 +2,20 @@ from django.shortcuts import render
 from tournament.models import Judge, Room_Stat, Speaker, Team, SpeakerPoint, Room, Tournament_Settings
 from tournament.forms import CodeForm, JudgeBallot, AdminForm
 from django.http import HttpResponseRedirect, HttpResponse
+
+#Check for duplicate ballots
+def check_duplicate():
+    teams_all = Team.objects.all()
+    std_postr = len(teams_all[0].po_str)
+    for team in teams_all:
+        if len(team.po_str) != std_postr:
+            return (True)
+    return (False)
+
 #Judge code input
 def index(request):
+    if check_duplicate():
+        return (HttpResponse('Fatal Error! Duplicate Ballots, report to your admin immediately'))
     initiate = Room_Stat.objects.get_or_create(round_number=0, prop_team=Team.objects.all()[0],oppo_team=Team.objects.all()[1], chair=Judge.objects.all()[0],room_id=Room.objects.all()[0])
     n = Room_Stat.objects.order_by('-round_number')[0]
     break_number = Tournament_Settings.objects.all()[0].Total_Rounds
@@ -21,15 +33,22 @@ def index(request):
             context_dict={'form':form}
     else:
         form = CodeForm()
+    team_all = Team.objects.all()
+    flag = True
+    for team in team_all:
+        if len(team.po_str) != n:
+            flag = False
     context_dict = {'form':form}
     context_dict['n'] = str(n)
-    context_dict['break_status'] = n > break_number
+    context_dict['break_status'] = (n == break_number) and flag
     context_dict['tournament_name'] = Tournament_Settings.objects.all()[0].Name_of_Tournament
     context_dict['tab_released'] = Tournament_Settings.objects.all()[0].Tab_Released
     return (render(request,'index.html',context_dict))
 
 #Ballot for Judge
 def judge(request,judge_code):
+    if check_duplicate():
+        return (HttpResponse('Fatal Error! Duplicate Ballots, report to your admin immediately'))
     #Get Judge name
     tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
     try:
@@ -48,6 +67,8 @@ def judge(request,judge_code):
     if judge:
         try:
             round_match = Room_Stat.objects.get(chair=judge.name, round_number=n)
+            if judge.round_filled == n:
+                return (HttpResponseRedirect('/tournament/'))
         except Room_Stat.DoesNotExist:
             context_dict['judge_name'] = None
             round_match = None
@@ -161,6 +182,8 @@ def matchup(request):
     registration_open = Tournament_Settings.objects.all()[0].Registration_Open
     if registration_open:
         return (HttpResponseRedirect('/tournament/'))
+    if check_duplicate():
+        return (HttpResponse('Fatal Error! Duplicate Ballots, report to your admin immediately'))
     initiate = Room_Stat.objects.get_or_create(round_number=0, prop_team=Team.objects.all()[0],oppo_team=Team.objects.all()[1], chair=Judge.objects.all()[0],room_id=Room.objects.all()[0])
     n = Room_Stat.objects.order_by('-round_number')[0]
     n_int = n.round_number
@@ -256,11 +279,18 @@ def show_tab(request):
     return (render(request,'show_tab.html',context_dict))
 
 def judge_check(request):
+    if check_duplicate():
+        return (HttpResponse('Fatal Error! Duplicate Ballots, report to your admin immediately'))
     context_dict = {}
     n = Room_Stat.objects.order_by('-round_number')[0]
     n = n.round_number
     break_number = Tournament_Settings.objects.all()[0].Total_Rounds
-    break_status = n > break_number
+    team_all = Team.objects.all()
+    flag = True
+    for team in team_all:
+        if len(team.po_str) != n:
+            flag = False
+    break_status = (n == break_number) and flag
     #If Breaking available
     if break_status:
         if request.method == "POST":
@@ -323,6 +353,8 @@ def show_matchup(request, round_number):
     registration_open = Tournament_Settings.objects.all()[0].Registration_Open
     if registration_open:
         return (HttpResponseRedirect('/tournament/'))
+    if check_duplicate():
+        return (HttpResponse('Fatal Error! Duplicate Ballots, report to your admin immediately'))
     try:
         room_stat = Room_Stat.objects.filter(round_number=int(round_number))
     except Room_Stat.DoesNotExist:

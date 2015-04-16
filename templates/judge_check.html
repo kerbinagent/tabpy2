@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block body_block %}
+{% if not break_status %}
   {% if judge_list %}
   <div class="container">
-    {% if not break_status %}
     <div class="alert alert-warning">
       This is information for <code>Round <strong>{{round_number}}</strong></code>
     </div>
@@ -15,29 +15,6 @@
       <li>{{judge}}</li>
       {% endfor %}
     </ul>
-    {% else %}
-    <div class="alert alert-success">
-      Breaking List Generated! Enter your code below to view
-    </div>
-
-    {% if form.errors %}
-      {% for field in form.visible_fields %}
-        {% for err in field.errors %}
-        <div class="alert alert-danger">
-          {{err}}
-        </div>
-        {% endfor %}
-      {% endfor %}
-    {% endif %}
-
-    <form method="post" action="">
-      {% csrf_token %}
-      {{form.code}}
-      <input type="submit" name="submit" class="btn btn-primary" value="Get the breaking list">
-    </form>
-
-    <br>
-    {% endif %}
   </div>
   {% else %}
   <div class="container">
@@ -46,6 +23,31 @@
     </div>
   </div>
   {% endif %}
+{% else %}
+<div class="container">
+  <div class="alert alert-success">
+    Breaking List Generated! Enter your code below to view
+  </div>
+
+  {% if form.errors %}
+    {% for field in form.visible_fields %}
+      {% for err in field.errors %}
+      <div class="alert alert-danger">
+        {{err}}
+      </div>
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" action="">
+    {% csrf_token %}
+    {{form.code}}
+    <input type="submit" name="submit" class="btn btn-primary" value="Get the breaking list">
+  </form>
+
+  <br>
+</div>
+{% endif %}
   <div class="container">
     <a href="/tournament/" class="btn btn-primary">Click to Return</a>
   </div>
