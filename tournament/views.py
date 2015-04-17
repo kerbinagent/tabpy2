@@ -5,14 +5,18 @@ from django.http import HttpResponseRedirect, HttpResponse
 
 #Check for duplicate ballots
 def check_duplicate():
-    n = SpeakerPoint.objects.order_by('-round_number')[0]
-    n = n.round_number
-    n = SpeakerPoint.objects.filter(round_number=n)
-    speaker_n = Speaker.objects.count()
-    if len(n) == speaker_n:
-        flag = True
-    else:
+    n = SpeakerPoint.objects.count()
+    if n == 0 :
         flag = False
+    else:
+        n = SpeakerPoint.objects.order_by('-round_number')[0]
+        n = n.round_number
+        n = SpeakerPoint.objects.filter(round_number=n)
+        speaker_n = Speaker.objects.count()
+        if len(n) == speaker_n:
+            flag = True
+        else:
+            flag = False
     flag2 = False
     teams_all = Team.objects.all()
     std_postr = len(teams_all[0].po_str)
