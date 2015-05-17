@@ -37,11 +37,26 @@
               <li>
                 <a href="/feedback/">Feedback</a>
               </li>
+              <li>
+                <a href="/admpanel/">Admin</a>
+              </li>
             </ul>
+            {% if user.is_authenticated %}
+            <div class="navbar-text navbar-right">
+              Welcome {{user.username}}
+              <a href="/admpanel/logout"><strong>logout</strong></a>
+            </div>
+            {% else %}
+            <div class="navbar-text navbar-right">
+              <a href = "/admpanel/login">Log in</a>
+            </div>
+            {% endif %}
           </div><!--/.nav-collapse -->
         </div>
       </nav>
+
       {% block body_block %}{% endblock %}
+
       <hr>
       <div class="container">
         WTab, published under GNU General Public License v2 by Houze Wang

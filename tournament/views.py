@@ -1,209 +1,180 @@
 from django.shortcuts import render
 from tournament.models import Judge, Room_Stat, Speaker, Team, SpeakerPoint, Room, Tournament_Settings
-from tournament.forms import CodeForm, JudgeBallot, AdminForm
+from django.contrib.auth.decorators import login_required
+from admpanel.views import check_init
+from admpanel.models import Ballot, UserProfile
+from tournament.forms import JudgeBallot, AdminForm
 from django.http import HttpResponseRedirect, HttpResponse
+
+#initiate matchup
+def create_init():
+    initiate = Room_Stat.objects.get_or_create(matchup_id = 0,round_number=0, prop_team=Team.objects.all()[0],oppo_team=Team.objects.all()[1], chair=Judge.objects.all()[0],room_id=Room.objects.all()[0])
+    p_team = Team.objects.all()[0]
+    o_team = Team.objects.all()[1]
+    p_speakers = Speaker.objects.filter(team=p_team)
+    o_speakers = Speaker.objects.filter(team=o_team)
+    ballot_initiate = Ballot.objects.get_or_create(
+    ballot_id = 0, judge = Judge.objects.all()[0], room = Room.objects.all()[0], p_team = p_team, o_team = o_team, round_number=0,
+    p_1 = p_speakers[0], p_2 = p_speakers[1], p_3 = p_speakers[2],
+    o_1 = o_speakers[0], o_2 = o_speakers[1], o_3 = o_speakers[2],split=False
+    )
+
+def ballot_creation(n):
+    pair_list = Room_Stat.objects.filter(round_number=n)
+    for pair in pair_list:
+        base_n = Ballot.objects.order_by('-ballot_id')[0].ballot_id
+        p_team = pair.prop_team
+        p_speakers = Speaker.objects.filter(team=p_team)
+        o_team = pair.oppo_team
+        o_speakers = Speaker.objects.filter(team=o_team)
+        new_ballot = Ballot.objects.get_or_create(
+        ballot_id = base_n+1, judge = pair.chair, room = pair.room_id, p_team = p_team, o_team = o_team,round_number = n,
+        p_1 = p_speakers[0], p_2 = p_speakers[1], p_3 = p_speakers[2],
+        o_1 = o_speakers[0], o_2 = o_speakers[1], o_3 = o_speakers[2],split=False
+        )[0]
+        new_ballot.save()
 
 #Check for duplicate ballots
 def check_duplicate():
-    n = SpeakerPoint.objects.count()
-    if n == 0 :
-        flag = False
-    else:
-        n = SpeakerPoint.objects.order_by('-round_number')[0]
-        n = n.round_number
-        n = SpeakerPoint.objects.filter(round_number=n)
-        speaker_n = Speaker.objects.count()
-        if len(n) == speaker_n:
-            flag = True
-        else:
-            flag = False
-    flag2 = False
-    teams_all = Team.objects.all()
-    std_postr = len(teams_all[0].po_str)
-    for team in teams_all:
-        if len(team.po_str) != std_postr:
-            flag2 = True
-    return (flag and flag2)
+    return False
 
-#Judge code input
+#Home
 def index(request):
+    if len(check_init()) != 0:
+        return HttpResponseRedirect('/admpanel/init')
+    t_setting = Tournament_Settings.objects.count()
+    if t_setting == 0:
+        return (HttpResponseRedirect('/admin/'))
+    else:
+        tm_count = Team.objects.count()
+        if tm_count < 2:
+            return (HttpResponseRedirect('/registration/'))
+        else:
+            create_init()
     if check_duplicate():
         return (HttpResponse('Fatal Error! Duplicate Ballots, report to your admin immediately'))
-    initiate = Room_Stat.objects.get_or_create(round_number=0, prop_team=Team.objects.all()[0],oppo_team=Team.objects.all()[1], chair=Judge.objects.all()[0],room_id=Room.objects.all()[0])
+    create_init()
     n = Room_Stat.objects.order_by('-round_number')[0]
     break_number = Tournament_Settings.objects.all()[0].Total_Rounds
     registration_open = Tournament_Settings.objects.all()[0].Registration_Open
-    #Ininiate first matchup
     n = n.round_number
-    if n==0 and (not registration_open):
-        return (HttpResponseRedirect('/tournament/initiate_matchup'))
-    if request.method == "POST":
-        form = CodeForm(request.POST)
-        if form.is_valid():
-            redirect = '/tournament/judge/'+form.cleaned_data['code']
-            return HttpResponseRedirect(redirect)
-        else:
-            context_dict={'form':form}
-    else:
-        form = CodeForm()
     team_all = Team.objects.all()
     flag = True
     for team in team_all:
         if len(team.po_str) != n:
             flag = False
-    context_dict = {'form':form}
+    context_dict = {'tournament_name':Tournament_Settings.objects.all()[0].Name_of_Tournament}
     context_dict['n'] = str(n)
     context_dict['break_status'] = (n == break_number) and flag
-    context_dict['tournament_name'] = Tournament_Settings.objects.all()[0].Name_of_Tournament
     context_dict['tab_released'] = Tournament_Settings.objects.all()[0].Tab_Released
     return (render(request,'index.html',context_dict))
 
 #Ballot for Judge
-def judge(request,judge_code):
-    if check_duplicate():
-        return (HttpResponse('Fatal Error! Duplicate Ballots, report to your admin immediately'))
-    #Get Judge name
-    tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
+@login_required
+def judge(request):
+    #Detect Usertype (admin/judge/superuser)
     try:
-        judge=Judge.objects.get(code=judge_code)
-    except Judge.DoesNotExist:
-        judge=None
-    if judge:
-        context_dict={'judge_name':judge.name}
-    else:
-        context_dict={'judge_name':None}
-    n = Room_Stat.objects.order_by('-round_number')[0]
-    n = n.round_number
-    context_dict['round_number']=str(n)
-    context_dict['tournament_name']=tournament_name
-    #Get Match-up Data to display
-    if judge:
-        try:
-            round_match = Room_Stat.objects.get(chair=judge.name, round_number=n)
-            if judge.round_filled == n:
-                return (HttpResponseRedirect('/tournament/'))
-        except Room_Stat.DoesNotExist:
-            context_dict['judge_name'] = None
-            round_match = None
-    else:
-        round_match = None
-    if round_match:
-        prop_team = Team.objects.get(name=round_match.prop_team)
-        oppo_team = Team.objects.get(name=round_match.oppo_team)
-        context_dict['prop_team'] = prop_team.name
-        context_dict['oppo_team'] = oppo_team.name
-        prop_speakers = Speaker.objects.filter(team=prop_team)
-        p1 = prop_speakers[0]
-        p2 = prop_speakers[1]
-        p3 = prop_speakers[2]
-        oppo_speakers = Speaker.objects.filter(team=oppo_team)
-        o1 = oppo_speakers[0]
-        o2 = oppo_speakers[1]
-        o3 = oppo_speakers[2]
-        context_dict['p1']=p1
-        context_dict['p2']=p2
-        context_dict['p3']=p3
-        context_dict['o1']=o1
-        context_dict['o2']=o2
-        context_dict['o3']=o3
-    context_dict['round_check'] = round_match
-    #Save Ballot data
-    if request.method == "POST":
-        form = JudgeBallot(request.POST)
-        if form.is_valid():
-            #Team Score
-            prop_sum = form.cleaned_data['prop_1']+form.cleaned_data['prop_2']+form.cleaned_data['prop_3']+form.cleaned_data['prop_reply']
-            oppo_sum = form.cleaned_data['oppo_1']+form.cleaned_data['oppo_2']+form.cleaned_data['oppo_3']+form.cleaned_data['oppo_reply']
-            split = form.cleaned_data['split']
-            if prop_sum > oppo_sum:
-                prop_team.total_wl +=1
-                if split:
-                    prop_team.total_ballots += 2
-                    oppo_team.total_ballots += 1
-                else:
-                    prop_team.total_ballots += 3
-            else:
-                oppo_team.total_wl +=1
-                if split:
-                    oppo_team.total_ballots += 2
-                    prop_team.total_ballots += 1
-                else:
-                    oppo_team.total_ballots += 3
+        user_profile = UserProfile.objects.get(user=request.user)
+        if user_profile.user_admin:
+            return HttpResponseRedirect('/admpanel/')
+    except UserProfile.DoesNotExist:
+        return HttpResponseRedirect('/admin/')
+    judge = user_profile.judge
+    n = Ballot.objects.order_by('-round_number')[0].round_number
+    try:
+        judge_ballot = Ballot.objects.get(judge=judge, round_number=n)
+    except Ballot.DoesNotExist:
+        return HttpResponseRedirect('/tournament/')
+    current_ballot_id = judge_ballot.ballot_id
+    return HttpResponseRedirect('/admpanel/ballot/'+str(current_ballot_id))
 
-            prop_team.total_po +=1
-            prop_team.total_sp += prop_sum
-            oppo_team.total_sp += oppo_sum
-            prop_team.total_mg += prop_sum-oppo_sum
-            oppo_team.total_mg += oppo_sum-prop_sum
-            prop_team.po_str = prop_team.po_str + "1"
-            oppo_team.po_str = oppo_team.po_str + "0"
-            prop_team.save()
-            oppo_team.save()
-            #Individual Score
-            p1.total_sp += form.cleaned_data['prop_1']
-            point_object = SpeakerPoint.objects.get_or_create(speaker_id=p1, round_number=n)[0]
-            point_object.point = form.cleaned_data['prop_1']
-            point_object.save()
-            p1.save()
-
-            p2.total_sp += form.cleaned_data['prop_2']
-            point_object = SpeakerPoint.objects.get_or_create(speaker_id=p2, round_number=n)[0]
-            point_object.point = form.cleaned_data['prop_2']
-            point_object.save()
-            p2.save()
-
-            p3.total_sp += form.cleaned_data['prop_3']
-            point_object = SpeakerPoint.objects.get_or_create(speaker_id=p3, round_number=n)[0]
-            point_object.point = form.cleaned_data['prop_3']
-            point_object.save()
-            p3.save()
-
-            o1.total_sp += form.cleaned_data['oppo_1']
-            point_object = SpeakerPoint.objects.get_or_create(speaker_id=o1, round_number=n)[0]
-            point_object.point = form.cleaned_data['oppo_1']
-            point_object.save()
-            o1.save()
-
-            o2.total_sp += form.cleaned_data['oppo_2']
-            point_object = SpeakerPoint.objects.get_or_create(speaker_id=o2, round_number=n)[0]
-            point_object.point = form.cleaned_data['oppo_2']
-            point_object.save()
-            o2.save()
-
-            o3.total_sp += form.cleaned_data['oppo_3']
-            point_object = SpeakerPoint.objects.get_or_create(speaker_id=o3, round_number=n)[0]
-            point_object.point = form.cleaned_data['oppo_3']
-            point_object.save()
-            o3.save()
-
-            judge.round_filled = n
-            judge.save()
-
-            #Detect Need to Matchup
-            if len(SpeakerPoint.objects.filter(round_number=n)) == Speaker.objects.count():
-                return (HttpResponseRedirect('/tournament/initiate_matchup'))
-            else:
-                return (HttpResponseRedirect('/tournament/'))
+def process_ballot(n):
+    all_ballots = Ballot.objects.filter(round_number=n)
+    for ballot in all_ballots:
+        #Team Save
+        p_team = ballot.p_team
+        o_team = ballot.o_team
+        p_sum = ballot.p1s+ballot.p2s+ballot.p3s+ballot.prs
+        o_sum = ballot.o1s+ballot.o2s+ballot.o3s+ballot.ors
+        if ballot.split:
+            winner_ballot = 2
         else:
-            context_dict['form'] = form
-    else:
-        context_dict['form'] = JudgeBallot()
-    return (render(request,'judge.html',context_dict))
+            winner_ballot = 3
+        if p_sum == o_sum:
+            return HttpResponse("Fatal Error! Ballot ID "+str(ballot.ballot_id)+" has no winner")
+        p_team.total_po += 1
+        p_team.po_str += '1'
+        o_team.po_str += '0'
+        p_team.total_sp += p_sum
+        o_team.total_sp += o_sum
+        p_team.total_mg += p_sum-o_sum
+        o_team.total_mg += o_sum-p_sum
+        if p_sum > o_sum:
+            p_team.total_wl +=1
+            p_team.total_ballots += winner_ballot
+            o_team.total_ballots += 3-winner_ballot
+        else:
+            o_team.total_wl +=1
+            o_team.total_ballots += winner_ballot
+            p_team.total_ballots += 3-winner_ballot
+        p_team.save()
+        o_team.save()
 
-#Match Up
+        #Speaker Save
+        p_1 = ballot.p_1
+        p_1.total_sp += ballot.p1s
+        p_2 = ballot.p_2
+        p_2.total_sp += ballot.p2s
+        p_3 = ballot.p_3
+        p_3.total_sp += ballot.p3s
+        o_1 = ballot.o_1
+        o_1.total_sp += ballot.o1s
+        o_2 = ballot.o_2
+        o_2.total_sp += ballot.o2s
+        o_3 = ballot.o_3
+        o_3.total_sp += ballot.o3s
+        p_1.save()
+        p_2.save()
+        p_3.save()
+        o_1.save()
+        o_2.save()
+        o_3.save()
+
+#Check if match_up has been generated
+def matchup_check():
+    n = Ballot.objects.order_by('-round_number')[0].round_number
+    n_r = Room_Stat.objects.order_by('-round_number')[0].round_number
+    if n == n_r:
+        return False
+    else:
+        return True
+
+@login_required
 def matchup(request):
+    #Detect Usertype (admin/judge/superuser)
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+        if not user_profile.user_admin:
+            return HttpResponseRedirect('/tournament/')
+    except UserProfile.DoesNotExist:
+        return HttpResponseRedirect('/admin/')
+
+    create_init()
     registration_open = Tournament_Settings.objects.all()[0].Registration_Open
     if registration_open:
         return (HttpResponseRedirect('/tournament/'))
     if check_duplicate():
         return (HttpResponse('Fatal Error! Duplicate Ballots, report to your admin immediately'))
-    initiate = Room_Stat.objects.get_or_create(round_number=0, prop_team=Team.objects.all()[0],oppo_team=Team.objects.all()[1], chair=Judge.objects.all()[0],room_id=Room.objects.all()[0])
     n = Room_Stat.objects.order_by('-round_number')[0]
     n_int = n.round_number
     n = float(n.round_number)
     break_rounds = Tournament_Settings.objects.all()[0].Total_Rounds
     if n_int == break_rounds:
         return (HttpResponseRedirect('/tournament/'))
+    if matchup_check():
+        return HttpResponse("Matchup already generated!")
+    if n_int > 0:
+        process_ballot(n_int)
     #Rank Team and Split into brackets
     ranked_list = Team.objects.order_by('-total_wl','-total_sp','-total_mg')
     bracket_list = []
@@ -270,10 +241,26 @@ def matchup(request):
     room_list = Room.objects.order_by('distance_to_hall')
     i=0
     while i<len(pair_list):
-        room_stat = Room_Stat.objects.get_or_create(round_number=n_int+1, chair=judge_list[i], prop_team=pair_list[i][0], oppo_team=pair_list[i][1], room_id=room_list[i])[0]
+        current_id = Room_Stat.objects.order_by('-matchup_id')[0].matchup_id
+        room_stat = Room_Stat.objects.get_or_create(matchup_id = current_id+1, round_number=n_int+1, chair=judge_list[i], prop_team=pair_list[i][0], oppo_team=pair_list[i][1], room_id=room_list[i])[0]
         room_stat.save()
         i+=1
-    return (HttpResponseRedirect('/tournament/'))
+    print (n_int+1)
+    return (HttpResponseRedirect('/admpanel/'))
+
+#Create ballots
+@login_required
+def matchup_next(request,n):
+    #Detect User type
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+        if not user_profile.user_admin:
+            return HttpResponseRedirect('/tournament/')
+    except UserProfile.DoesNotExist:
+        return HttpResponseRedirect('/admin/')
+    n_int = int(n)
+    ballot_creation(n)
+    return HttpResponseRedirect("/admpanel/")
 
 def show_tab(request):
     team_all = Team.objects.order_by('-total_wl','-total_sp','-total_mg')
@@ -290,46 +277,6 @@ def show_tab(request):
     context_dict['Tab_Released'] = Tournament_Settings.objects.all()[0].Tab_Released
 
     return (render(request,'show_tab.html',context_dict))
-
-def judge_check(request):
-    if check_duplicate():
-        return (HttpResponse('Fatal Error! Duplicate Ballots, report to your admin immediately'))
-    context_dict = {}
-    n = Room_Stat.objects.order_by('-round_number')[0]
-    n = n.round_number
-    break_number = Tournament_Settings.objects.all()[0].Total_Rounds
-    team_all = Team.objects.all()
-    flag = True
-    for team in team_all:
-        if len(team.po_str) != n:
-            flag = False
-    break_status = (n == break_number) and flag
-    #If Breaking available
-    if break_status:
-        if request.method == "POST":
-            form = AdminForm(request.POST)
-            if form.is_valid():
-                admin_code = form.cleaned_data['code']
-                return (HttpResponseRedirect('/tournament/breaking/'+admin_code))
-            else:
-                context_dict = {'form':form}
-        else:
-            form = AdminForm()
-        context_dict['break_status'] = break_status
-        context_dict['form'] = form
-    #If breaking not available
-    try:
-        judge_list = Judge.objects.filter(round_filled=n-1)
-    except Judge.DoesNotExist:
-        judge_list = None
-    if n == 1:
-        judge_list = Judge.objects.filter(round_filled=-1)
-    tournament_name = Tournament_Settings.objects.all()[0].Name_of_Tournament
-    context_dict['judge_list'] = judge_list
-    context_dict['round_number'] = n
-    context_dict['tournament_name'] = tournament_name
-    context_dict['break_status'] = break_status
-    return (render(request,'judge_check.html',context_dict))
 
 def breaking(request, admin_code):
     settings = Tournament_Settings.objects.all()[0]

@@ -116,6 +116,7 @@ class Migration(migrations.Migration):
                 ('Tab_Released', models.BooleanField(default=False)),
                 ('Registration_Open', models.BooleanField(default=True)),
                 ('Admin_Code', models.CharField(default=b'admin', max_length=8)),
+                ('Judge_Code', models.CharField(default=b'judge', max_length=8)),
             ],
             options={
             },

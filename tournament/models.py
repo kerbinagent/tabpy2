@@ -52,9 +52,7 @@ class SpeakerPoint(models.Model):
 
 class Judge(models.Model):
     name = models.CharField(max_length=64, unique=True, primary_key=True)
-    code = models.CharField(max_length=8, unique=True, default='CODE')
     weight = models.IntegerField(default=1)
-    round_filled = models.IntegerField(default=-1)
 
     def __unicode__(self):
         return (self.name)
@@ -67,6 +65,7 @@ class Room(models.Model):
         return (self.name)
 
 class Room_Stat(models.Model):
+    matchup_id = models.IntegerField(unique=True, default=0)
     prop_team = models.ForeignKey(Team,related_name='prop_team')
     oppo_team = models.ForeignKey(Team,related_name='oppo_team')
     room_id = models.ForeignKey(Room)
@@ -89,6 +88,7 @@ class Tournament_Settings(models.Model):
     Tab_Released = models.BooleanField(default=False)
     Registration_Open = models.BooleanField(default=True)
     Admin_Code = models.CharField(default="admin",max_length=8)
+    Judge_Code = models.CharField(default="judge",max_length=8)
 
     def __unicode__(self):
         return ("Global Setting for Tournament")

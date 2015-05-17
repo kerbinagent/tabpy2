@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<div class="container">
+  <div class="page-header">
+    <h1>Log In<small><a href="/admpanel/registration">Register</a></small></h1>
+  </div>
+  {% if user.is_authenticated %}
+  <div class="alert alert-success">
+    You have already logged in.
+  </div>
+  <a href="/tournament" class="btn btn-primary">Click to go back</a>
+  {% else %}
+  {% if error %}
+  <div class="alert alert-danger">
+    <small>{{error}}</small>
+  </div>
+  <a href='/admpanel/login' class="btn btn-primary">Try again</a>
+  {% else %}
+  <form method="post" action="/admpanel/login">
+    {% csrf_token %}
+    <div class="form-group">
+      Username: <input type="text" name="username" value="" size="50" class="form-control">
+    </div>
+
+    <div class="form-group">
+      Password: <input type="password" name="password" value="" size="50" class="form-control">
+    </div>
+
+    <input type="submit" value="submit" class="btn btn-primary">
+
+  </form>
+  {% endif %}
+  {% endif %}
+</div>
+
+{% endblock %}

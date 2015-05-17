@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<div class="container">
+  <div role="tabpanel">
+
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="active">
+        <a href="#general" aria-controls="general" data-toggle="tab" role="tab">General Setting</a>
+      </li>
+      <li role="presentation">
+        <a href="#judge" aria-controls="judge" role="tab" data-toggle="tab">Judge</a>
+      </li>
+      <li role="presentation">
+        <a href="#room" aria-controls="room" role="tab" data-toggle="tab">Room</a>
+      </li>
+      <li role="presentation">
+        <a href="#school" aria-controls="school" role="tab" data-toggle="tab">School</a>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+
+      <div role="tabpanel" class="tab-pane active" id="general">
+        <br>
+        <!--Show alerts for all errors-->
+        {% if error_type.0 %}
+        <div class="alert alert-danger">
+          <strong>Tournament Settings not found! Create One below</strong>
+        </div>
+        {% endif %}
+        {% if error_type.1 %}
+        <div class="alert alert-danger">
+          <strong>No School found! Create one in <code>School</code> tab</strong>
+        </div>
+        {% endif %}
+        {% if error_type.2 %}
+        <div class="alert alert-danger">
+          <strong>Judge not Enough! Manage judge in <code>Judge</code> tab</strong>
+        </div>
+        {% endif %}
+        {% if error_type.3 %}
+        <div class="alert alert-danger">
+          <strong>Room not Enough! Manage rooms in <code>Room</code> tab</strong>
+        </div>
+        {% endif %}
+        {% if error_type.4 %}
+        <div class="alert alert-danger">
+          <strong>Odd Team Number! Register a swing team!</strong>
+        </div>
+        {% endif %}
+
+        <!--Create Setting if needed-->
+        {% if error_type.0 %}
+        <form method="post" action="/admpanel/init">
+          {% csrf_token %}
+          {{form.as_p}}
+          <input value="Create Setting" type="submit" name="submit" class="btn btn-default">
+        </form>
+        {% endif %}
+      </div>
+      <div role="tabpanel" class="tab-pane" id="judge">
+        <br>
+        {% if not judge_list %}
+        <div class="alert alert-danger">
+          No Judge Found
+        </div>
+        {% else %}
+        <table class="table table-striped">
+          <tr>
+            <th>
+              Judge Name
+            </th>
+            <th>
+              Judge weight (higher is better)
+            </th>
+          </tr>
+          {% for judge in judge_list %}
+          <tr>
+            <td>
+              {{judge.name}}
+            </td>
+            <td>
+              {{judge.weight}}
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+        <a href="/admpanel/newentry/1" class="btn btn-default">Register New judge</a>
+
+      </div>
+      <div role="tabpanel" class="tab-pane" id="room">
+        <br>
+        {% if not room_list %}
+        <div class="alert alert-danger">
+          No Room Found
+        </div>
+        {% else %}
+        <table class="table table-striped">
+          <tr>
+            <th>
+              Room Label
+            </th>
+            <th>
+              Distance to the Main Hall
+            </th>
+          </tr>
+          {% for room in room_list %}
+          <tr>
+            <td>
+              {{room.name}}
+            </td>
+            <td>
+              {{room.distance_to_hall}}
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+        <a href="/admpanel/newentry/2" class="btn btn-default">Create New Room</a>
+
+      </div>
+      <div role="tabpanel" class="tab-pane" id="school">
+        <br>
+        {% if not school_list %}
+        <div class="alert alert-danger">
+          No School Found
+        </div>
+        {% else %}
+        <table class="table table-striped">
+          <tr>
+            <th>
+              School
+            </th>
+          </tr>
+          {% for school in school_list %}
+          <tr>
+            <td>
+              {{school.name}}
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+        <a href="/admpanel/newentry/3" class="btn btn-default">Create New School</a>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

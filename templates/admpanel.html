@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<div class="container">
+
+  <div class="page-header">
+    <h1>Admin Panel</h1>
+  </div>
+
+  <div role="tabpanel">
+
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="dropdownmenu1">Ballot<span class="caret"></span></a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownmenu1" id="drop1-content">
+          {% if not ballots %}
+          <li>
+            <a tabindex="-1" href="#">No Ballots Found</a>
+          </li>
+          {% else %}
+          {% for setballots in ballots %}
+          <li>
+            <a tableindex="-1" href="#round{{setballots.0}}" role="tab" data-toggle="tab" area-controls="round{{setballots.0}}">Round {{setballots.0}}</a>
+          </li>
+          {% endfor %}
+          {% endif %}
+        </ul>
+      </li>
+      <li role="presentation">
+        <a href="#judge" aria-controls="ballot" role="tab" data-toggle="tab">Judge</a>
+      </li>
+      <li role="presentation">
+        <a href="#matchup" aria-controls="matchup" role="tab" data-toggle="tab">Matchup</a>
+      </li>
+      <li role="presentation" class="active">
+        <a href="#general" aria-controls="general" role="tab" data-toggle="tab">General Setting</a>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+
+      {% for setballots in ballots %}
+      <div role="tabpanel" class="tab-pane" id="round{{setballots.0}}">
+        <br>
+        <table class="table table-striped">
+          <tr>
+            <th>Room</th>
+            <th>Judge</th>
+            <th>Proposition</th>
+            <th>Opposition</th>
+            <th>Action</th>
+          </tr>
+          {% for ballot in setballots.1 %}
+          <tr>
+            <td>{{ballot.room}}</td>
+            <td>{{ballot.judge}}</td>
+            <td>{{ballot.p_team}}</td>
+            <td>{{ballot.o_team}}</td>
+            <td>
+              <a href="/admpanel/ballot/{{ballot.ballot_id}}">Edit</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      {% endfor %}
+      <div role="tabpanel" class="tab-pane" id="judge">
+        <br>
+        {% if not generated %}
+        {% if missing_list %}
+        <div class="well well-sm">
+          Ballots from the following judge(s) is/are missing
+        </div>
+        {% for judge in missing_list %}
+        {{judge.name}}
+        {% endfor %}
+        {% else %}
+        <div class="alert alert-success">
+          All ballots collected!
+        </div>
+        <a href="/tournament/initiate_matchup" class="btn btn-primary">Click to Generate Matchup for preview</a>
+        {% endif %}
+        {% else %}
+        <div class="alert alert-success">
+          Ballots all collected, matchup generated. Proceed to matchup tab to confirm
+        </div>
+        {% endif %}
+      </div>
+      <div role="tabpanel" class="tab-pane" id="matchup">
+        <br>
+        {% if generated %}
+        <div class="alert alert-info">
+          Editing Matchup for Round {{round_number}}. When done, press generate ballots
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+          Initial Matchup not generated. Showing current matchup for this round
+        </div>
+        {% endif %}
+        {% if error_message %}
+        {% for message in error_message %}
+        <div class="alert alert-danger">
+          {{message}} DO NOT PROCEED
+        </div>
+        {% endfor %}
+        {% endif %}
+        <table class="table table-striped">
+          <tr>
+            <th>Prop</th>
+            <th>Oppo</th>
+            <th>Room</th>
+            <th>Judge</th>
+            <th>Action</th>
+          </tr>
+          {% for match in match_list %}
+          <tr>
+            <td>{{match.prop_team}}</td>
+            <td>{{match.oppo_team}}</td>
+            <td>{{match.room_id}}</td>
+            <td>{{match.chair}}</td>
+            {% if generated %}
+            <td>
+              <a href="/admpanel/matchup/{{match.matchup_id}}">Edit</a>
+            </td>
+            {% else %}
+            <td>
+              Not available
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </table>
+        {% if generated %}
+        {% if error_message %}
+        <div class="btn btn-default">Disabled Due to Error</div>
+        {% else %}
+        <a class="btn btn-default" href="/tournament/initiate_next/{{round_number}}">Generate ballots</a>
+        {% endif %}
+        {% endif %}
+      </div>
+      <div role="tabpanel" class="tab-pane active" id="general">
+        <br>
+        {% if notice_list %}
+        {% for notice in notice_list %}
+        <div class="alert alert-warning">
+          {{notice}}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post" action="/admpanel/">
+          {% csrf_token %}
+          {{form.as_p}}
+          <input value="Update Setting" type="submit" name="submit" class="btn btn-default">
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -15,7 +15,10 @@ def index(request):
             team_name = form.cleaned_data['name']
             team = Team.objects.get(name=team_name)
             #Create New Debater
-            speaker_id = Speaker.objects.order_by('-speaker_id')[0].speaker_id
+            if Speaker.objects.count() == 0:
+                speaker_id = 0
+            else:
+                speaker_id = Speaker.objects.order_by('-speaker_id')[0].speaker_id
             sdata = sform.cleaned_data
             speaker = Speaker.objects.get_or_create(name=sdata['name1'],school=sdata['school1'],team=team,speaker_id=speaker_id+1,novice=sdata['novice1'])
             speaker = speaker[0]

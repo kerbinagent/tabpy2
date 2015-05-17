@@ -1,17 +1,18 @@
 import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tabpy2.settings')
-
+import hashlib
 import django
 django.setup()
 
-from tournament.models import Team
+from tournament.models import Team, Speaker, Judge
 
-team_list = Team.objects.order_by('-total_wl','-total_sp','-total_mg')
-temp_list = []
-for team in team_list:
-    temp = []
-    temp.append(team.name)
-    temp.append(team.total_wl)
-    temp_list.append(temp)
-print (temp_list)
-print (temp_list[0][0])
+
+judges_all = Judge.objects.all()
+for judge in judges_all:
+    judge.round_filled = -1
+    pwd = judge.name+"suonidafahao"
+    pwd = hashlib.sha256(pwd.encode())
+    pwd = pwd.hexdigest()
+    pwd = pwd[:4]
+    judge.code = pwd
+    judge.save()

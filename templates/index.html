@@ -22,14 +22,10 @@
       {% endif %}
     {% endfor %}
     <p>
-      We have brilliant online ballots so you don't have to figure out the total speaker scores. Just enter your assigned judge code below to get started.
+      We have brilliant online ballots so you don't have to figure out the total speaker scores. Click the button below to fill in ballot
     </p>
     <br>
-    <form id="code_input" method="post" action="">
-      {% csrf_token %}
-      {{form.code}}
-      <input type="submit" name="submit" class="btn btn-primary" value="Get This Round's Ballot">
-    </form>
+    <a href="/tournament/judge" class="btn btn-primary">Go to Ballot</a>
   </div>
   <div class="col-md-4">
     <h3>For Debaters</h3>
@@ -55,8 +51,7 @@
       We offer unparalled speed for tabbing. Tabbing shouldn't consume possible time for quality debates. Manage your tournament here:
     </p>
     <br>
-    <a href="/admin" class="btn btn-primary">Go to Admin Site</a>
-    <a class="btn btn-primary" href="/tournament/judge-check">Check Judge Status</a>
+    <a href="/admpanel" class="btn btn-primary">Go to Admin Site</a>
   </div>
 </div>
 {% endblock %}
