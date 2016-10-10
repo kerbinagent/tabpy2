@@ -149,8 +149,6 @@ The admin can view all ballots and edit them at Admin Panel. The same with judge
 
 ## 6. Installation
 
-Currently the app is hosted at [Sinaapp](http://cntab.sinaapp.com)
-
 That version uses MySQL as database instead of the default sqlite3. If you want to run the software on your own (or do some customization), Remember to turn debug off (some idea of django/python is strongly recommended in that case)
 
 ## 7. Further notes
